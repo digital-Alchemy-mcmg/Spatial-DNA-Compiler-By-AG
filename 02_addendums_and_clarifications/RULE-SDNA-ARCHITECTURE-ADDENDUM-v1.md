@@ -103,48 +103,43 @@ SECTION CITATION MAP:
   [‽] Section C: Skills and Strengths
   [⁂] Section D: Education
 
-### 6. Verification Engine Harmonization: Hardened Check H
+### 6. Verification Engine Harmonization: Hardened Check H & Check F
 
-Under this addendum, **Check H** in Step 10 is updated from the legacy "Non-Blurb Separation" into **"Section Attribution & Classification Integrity"**. It audits:
+Under this addendum, **Check H** in Step 10 is updated from the legacy "Non-Blurb Separation" into **"Attribution & Classification Integrity"**, and **Check F** is harmonized to account for all evidence types.
 
-1. **Exact 1:1 Citation Provenance:**
-   - Every section blurb's Unicode citation must strictly equal `section_map[blurb.section_label]`. It cannot merely match *any* declared symbol.
-   - Every employment blurb's citation must strictly equal `employment_map[blurb.employment_label]`.
-2. **Mutual Exclusion on `SELF_REPORTED`:**
-   - Section blurbs **must** be classified as `SELF_REPORTED`.
-   - Employment blurbs **must NOT** be classified as `SELF_REPORTED` (they represent employment accomplishments/responsibilities).
-   - Zero orphaned blurbs: every atom must explicitly declare either `employment_label` or `section_label`.
-3. **Macro Container Cleanliness:**
-   - Macro bundles in `DocumentTwin.non_blurb_info` must carry `SELF_REPORTED` and must **never** receive an atomic UID or collide with atomic blurbs.
+#### Harmonized Rules:
+1. **Three Mutually Exclusive Provenance Channels:**
+   - **Case A (Employment Blurbs):** Must link to a declared employer (`employment_label`), match that employer's exact citation (`employment_map[label]`), and must **NOT** be classified as `SELF_REPORTED`.
+   - **Case B (Section Blurbs):** Must link to a declared section (`section_label`), match that section's exact citation (`section_map[label]`), and **MUST** be classified as `SELF_REPORTED`.
+   - **Case C (Media Blurbs per `RULE-SDNA-MEDIA-PROVENANCE-v1`):** Must carry `provenance_type == "MEDIA_MANIFEST"`, link to a valid `media_id` matching `media_manifest.json`, match the media file's binary `media_checksum`, and must have `citation == None`. **Check H and Check F must NEVER reject a valid media blurb for lacking an employer/section citation.**
+2. **Zero Orphaned Blurbs:** Every atom must belong to exactly one of the three valid channels (Employer, Section, or Media Manifest).
+3. **Macro Container Cleanliness:** Macro bundles in `DocumentTwin.non_blurb_info` must carry `SELF_REPORTED` and must **never** receive an atomic UID or collide with atomic blurbs.
 
 ```python
-def check_h_section_attribution_integrity(
+def check_h_attribution_and_classification_integrity(
     source_uid: str,
     non_blurb_bundles: List[Dict[str, Any]],
     atomic_blurbs: List[Dict[str, Any]],
     section_decls: List[Dict[str, Any]],
-    employment_decls: List[Dict[str, Any]]
+    employment_decls: List[Dict[str, Any]],
+    media_manifest: List[Dict[str, Any]]
 ) -> ValidationResult:
     """
-    Hardened Check H (SDNA Architectural Addendum v1):
+    Harmonized Check H:
     1. Macro Bundle Integrity: Confirms macro bundles are labeled SELF_REPORTED 
-       and NEVER assigned atomic UIDs.
-    2. Strict Citation Binding: Confirms every section blurb's Unicode citation 
-       matches THAT SPECIFIC parent section's assigned symbol.
-    3. Classification Boundary: Confirms section blurbs are labeled SELF_REPORTED, 
-       while employment blurbs are NOT labeled SELF_REPORTED.
+       and never assigned atomic UIDs.
+    2. Strict Citation Binding: Confirms employment & section blurbs match their 
+       exact parent symbol.
+    3. Media Provenance Branch: Confirms media blurbs link to valid media_id & checksum 
+       with citation == None.
+    4. Mutual Exclusion on SELF_REPORTED.
     """
     failures = []
     
-    # Pre-build lookup maps: Label -> Exact Assigned Unicode Citation
-    section_map = {
-        s["label"]: s.get("unicode_citation") 
-        for s in section_decls if "label" in s
-    }
-    employment_map = {
-        e["label"]: e.get("unicode_citation") 
-        for e in employment_decls if "label" in e
-    }
+    # Pre-build lookup maps
+    section_map = {s["label"]: s.get("unicode_citation") for s in section_decls if "label" in s}
+    employment_map = {e["label"]: e.get("unicode_citation") for e in employment_decls if "label" in e}
+    valid_media_ids = {m["media_id"]: m.get("checksum") for m in media_manifest if "media_id" in m}
     atom_uids = {b["uid"] for b in atomic_blurbs if "uid" in b}
 
     # 1. Macro Bundle Audit
@@ -163,49 +158,55 @@ def check_h_section_attribution_integrity(
         cit = blurb.get("citation")
         emp_label = blurb.get("employment_label")
         sec_label = blurb.get("section_label")
+        prov_type = blurb.get("provenance_type")
         classification = blurb.get("classification")
+        media_id = blurb.get("media_id")
 
-        if sec_label:
+        # Channel 1: Media Manifest Provenance
+        if prov_type == "MEDIA_MANIFEST" or media_id:
+            if not media_id or media_id not in valid_media_ids:
+                failures.append(f"Media atom {uid} references uncataloged media_id '{media_id}'")
+            else:
+                expected_hash = valid_media_ids[media_id]
+                if blurb.get("media_checksum") != expected_hash:
+                    failures.append(f"Media atom {uid} checksum mismatch against manifest")
+            # Must NOT carry an invented citation
+            if cit is not None:
+                failures.append(f"Media atom {uid} must have citation == None, found '{cit}'")
+
+        # Channel 2: Section-Derived Blurb
+        elif sec_label:
             if sec_label not in section_map:
                 failures.append(f"Atom {uid} references undeclared section '{sec_label}'")
             else:
                 expected_cit = section_map[sec_label]
                 if cit != expected_cit:
-                    failures.append(
-                        f"Atom {uid} citation mismatch: carries '{cit}', "
-                        f"but parent {sec_label} requires '{expected_cit}'"
-                    )
+                    failures.append(f"Atom {uid} citation mismatch: carries '{cit}', parent {sec_label} requires '{expected_cit}'")
             if classification != "SELF_REPORTED":
-                failures.append(
-                    f"Atom {uid} from section '{sec_label}' has invalid classification '{classification}'; "
-                    f"must be 'SELF_REPORTED'"
-                )
+                failures.append(f"Atom {uid} from section '{sec_label}' must be classified 'SELF_REPORTED'")
 
+        # Channel 3: Employment-Derived Blurb
         elif emp_label:
             if emp_label not in employment_map:
                 failures.append(f"Atom {uid} references undeclared employer '{emp_label}'")
             else:
                 expected_cit = employment_map[emp_label]
                 if cit != expected_cit:
-                    failures.append(
-                        f"Atom {uid} citation mismatch: carries '{cit}', "
-                        f"but parent {emp_label} requires '{expected_cit}'"
-                    )
+                    failures.append(f"Atom {uid} citation mismatch: carries '{cit}', parent {emp_label} requires '{expected_cit}'")
             if classification == "SELF_REPORTED":
-                failures.append(
-                    f"Atom {uid} from employer '{emp_label}' cannot be classified as 'SELF_REPORTED'; "
-                    f"must be verified employment evidence"
-                )
+                failures.append(f"Atom {uid} from employer '{emp_label}' cannot be 'SELF_REPORTED'")
+
+        # Unanchored Orphan
         else:
-            failures.append(f"Atom {uid} is orphaned: carries neither employment_label nor section_label")
+            failures.append(f"Atom {uid} is orphaned: lacks employment, section, and media manifest provenance")
 
     passed = (len(failures) == 0)
     return ValidationResult(
         source_uid=source_uid,
         check_id="H",
         passed=passed,
-        observed=str(failures) if failures else "All atomic blurbs and macro bundles strictly comply with attribution and classification rules",
-        expected="Exact parent citation matching, mutually exclusive SELF_REPORTED classification, and clean macro containers",
+        observed=str(failures) if failures else "All atomic blurbs strictly comply with attribution and classification rules",
+        expected="Exact parent citation matching, mutually exclusive SELF_REPORTED, and valid media provenance",
         failure_reason=None if passed else "; ".join(failures)
     )
 ```
