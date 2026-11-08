@@ -23,6 +23,10 @@ Do not paraphrase, rewrite, summarize, or synthesize the user's wording.
 
 The blurb receives the next sequential atomic UID in the Document Twin.
 
+> **AUDIT-021 — UID sequence consistency:** Verify that media atoms participate in the same continuous UID sequence as employment and section atoms.
+>
+> **Status:** OPEN — preserve until continuous cross-provenance sequencing is implemented and verified.
+
 ---
 
 ## 3. The Manifest Is the Provenance
@@ -85,6 +89,14 @@ The user's annotation remains preserved in the manifest. The blurb contains the 
    └── citation: null
 ```
 
+> **AUDIT-020 — Downstream schema consistency:** Verify that all five annotation fields appear in the workbook, manifest, data schema, persistence interface, and operating instructions.
+>
+> **Status:** OPEN — preserve until every downstream representation is corrected and verified.
+
+> **AUDIT-022 — Cross-check verification:** Ensure `MEDIA_MANIFEST`, media ID, checksum, manifest source location, and null citation are accepted by all applicable verification checks.
+>
+> **Status:** OPEN — preserve until every applicable check accepts and validates the complete media provenance path.
+
 ---
 
 ## 6. Downstream Verification & Accounting Invariants
@@ -94,5 +106,10 @@ The user's annotation remains preserved in the manifest. The blurb contains the 
    - Media entries awaiting user input remain valid under `annotation_status == "PENDING_USER"`.
 2. **Check J (Gatekeeper Accounting):**
    - Accounts for media awaiting user annotation (`pending_annotations`) without blocking the certification of completed media evidence.
+
+> **AUDIT-023 — Verification consistency:** Ensure pending and completed annotation states are handled according to this rule, without contradicting the other checks or blocking valid evidence.
+>
+> **Status:** OPEN — preserve until both annotation states are reconciled and verified across Checks I and J.
+
 3. **No External Citations:**
    - The media blurb's citation is `null`. The authority is rooted exclusively in the Media Evidence Manifest.

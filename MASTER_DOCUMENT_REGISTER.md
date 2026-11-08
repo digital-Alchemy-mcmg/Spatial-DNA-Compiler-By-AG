@@ -12,7 +12,16 @@ Preserved strictly for contextual and historical lineage; explicitly isolated fr
 | `README_SCOPE_ISOLATION.md` | Markdown | Explains isolation boundary between WBcompiler coordination protocols and SDNA Compiler architecture. | Explanatory Notice |
 | `INSTRUCTIONS-DELIVERY-v3.md` | Markdown | Packaging standard for WBcompiler coordination and delivery bundles. | Non-authoritative for SDNA pipeline logic. |
 | `INSTRUCTIONS-RATCHET-v4.md` | Markdown | Autonomous testing loop protocol for WBcompiler development iterations. | Non-authoritative for SDNA pipeline logic. |
+
+> **AUDIT-029 — Incorrect project authority:** These documents contain WBcompiler/Atrium instructions. They must not be listed as SDNA architectural authority.
+>
+> **Status:** OPEN — preserve until their authority classification is corrected and verified repository-wide.
+
 | `README_original_atrium.md` | Markdown | Initial workspace note from the atrium intake directory. | Historical record only. |
+
+> **AUDIT-030 — Scope contamination:** Identify the document as unrelated historical/reference material, not a governing SDNA instruction.
+>
+> **Status:** OPEN — preserve until its scope boundary is corrected and verified.
 
 ---
 
@@ -66,3 +75,7 @@ Formally approved rules, addendums, and directives establishing operational refi
 
 ## 7. Implementation Status & Inventory (`07_implementation_status/`)
 * **`IMPLEMENTATION_INVENTORY.md`**: Concrete audit of all 15 pipeline modules, establishing what is architecturally specified versus implemented in source versus tested versus verified.
+
+> **AUDIT-031 — Source-of-truth clarity:** Clearly identify which SDNA documents govern, which are historical references, and which are superseded or unresolved.
+>
+> **Status:** OPEN — preserve until the complete authority hierarchy is corrected and independently verified.

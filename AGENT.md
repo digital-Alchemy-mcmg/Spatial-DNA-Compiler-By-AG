@@ -67,6 +67,14 @@ When building the system, construct the following distinct component layers:
 10. **Evidence Workbook Builder (`step12_workbook.py`):** OpenPyXL engine rendering the styled 5-sheet workbook.
 11. **Packaging & Integrity Sweep (`step13_packaging.py`):** Final 8-point audit sealing `{Person}_sDNA.zip` and `package_inventory.json`.
 
+> **AUDIT-001 — Implementation claims:** The guide describes `save_media_annotation` and Step 9 behavior as existing functionality. No corresponding implementation source exists in this repository. Distinguish specified behavior from implemented and verified behavior.
+>
+> **Status:** OPEN — preserve until the implementation claim is corrected and verified against the repository.
+
+> **AUDIT-005 — Missing modules:** The listed modules and functions are not present in the repository. Identify these as required components, not existing implementation.
+>
+> **Status:** OPEN — preserve until the component inventory is corrected and verified against the repository.
+
 ---
 
 ### 2. Workbook Construction & Structure (5 Sheets)
@@ -110,6 +118,11 @@ evidence_workbook.xlsx
 
 #### Sheet 3: `Non-Blurb Bundles`
 * **Purpose:** Macro-level inspection view of unatomized self-reported section text blocks. Dual storage ensures that while individual claims are atomized in Sheet 2, the complete cohesive macro block remains inspectable here.
+
+> **AUDIT-002 — Section dual storage:** The description of Non-Blurb Bundles as unatomized text can imply that section content is stored only as macro bundles. The architecture requires both intact macro storage and granular atomic blurbs.
+>
+> **Status:** OPEN — preserve until dual storage is corrected and verified across the architecture.
+
 * **Columns (6):**
   1. `Source UID`
   2. `Twin ID`
@@ -133,6 +146,10 @@ evidence_workbook.xlsx
   9. `Associated Project` (User-declared employer/project)
   10. `Attribution / Issuer` (User-declared issuing body)
   11. `SHA-256 Checksum` (Binary digest)
+
+> **AUDIT-003 — Incomplete media inventory:** The Media Inventory omits `what_does_it_represent` and `attribution_issuer`. All five user annotation fields must be represented.
+>
+> **Status:** OPEN — preserve until all downstream media fields are corrected and verified.
 
 #### Sheet 5: `Admission Registry`
 * **Purpose:** Formal audit trail of admitted and rejected pairs.
@@ -240,6 +257,11 @@ class AtomicBlurb(BaseModel):
     media_id: Optional[str] = None               # "MED-K9L" if media-derived
     media_checksum: Optional[str] = None         # SHA-256 of media
 
+# AUDIT-004 — Incomplete AtomicBlurb schema: The media provenance field
+# provenance_type: "MEDIA_MANIFEST" is missing. The media atom also requires
+# its media ID, checksum, manifest source location, and null citation.
+# Status: OPEN — preserve until the schema is corrected and verified.
+
 class NonBlurbBundle(BaseModel):
     bundle_type: str                             # "Skills & Keywords", "Education"
     content: str                                 # Intact macro text block
@@ -289,6 +311,11 @@ Run the compliance test to guarantee the runtime is intact:
 ```powershell
 python verification_lap.py
 ```
+
+> **AUDIT-007 — Unavailable verification command:** `verification_lap.py` is absent. The operating instructions must not represent this command as executable.
+>
+> **Status:** OPEN — preserve until the command is backed by repository source and independently verified.
+
 *Expected Result:*
 ```
 [PASS] Step 0 & 1: Environment qualification and shared data contracts verified.
@@ -318,6 +345,10 @@ Execute the master pipeline orchestrator:
 python master_orchestrator.py
 ```
 
+> **AUDIT-008 — Unavailable orchestrator and incomplete operation:** `master_orchestrator.py` is absent. The media annotation lifecycle also lacks a complete operational explanation, including user submission and persistence/resumption.
+>
+> **Status:** OPEN — preserve until repository availability and the complete lifecycle are corrected and verified.
+
 #### What the System Does
 1. Inventories all files in `intake/`.
 2. Computes binary SHA-256 fingerprints.
@@ -328,6 +359,10 @@ python master_orchestrator.py
 7. Checks the anchor gates and writes `{source_uid}-000.json`.
 8. Audits the twin across Checks A through J; Check J certifies the `CompletionFooter`.
 9. Generates `pipeline_outputs/evidence_workbook.xlsx` and `pipeline_outputs/{Person}_sDNA.zip`.
+
+> **AUDIT-006 — Pseudocode versus implementation:** Media annotation and media-to-atom conversion are described as workflow operations, but their actual implementation is absent. Identify the missing persistence and conversion functionality.
+>
+> **Status:** OPEN — preserve until both functions are implemented and verified or clearly labeled as specifications.
 
 #### What the Agent Sees in Console
 ```
@@ -360,6 +395,10 @@ SDNA EVIDENCE FOUNDRY - MASTER PIPELINE EXECUTION
 ALL 14 STEPS EXECUTED & SEALED SUCCESSFULLY (Exit Code: 0)
 ============================================================================
 ```
+
+> **AUDIT-009 — Misleading Step 8 example:** The example shows macro bundles but does not show section-derived atomic blurbs. It must demonstrate both sides of dual storage.
+>
+> **Status:** OPEN — preserve until the example demonstrates both representations and is verified.
 
 ---
 
@@ -398,6 +437,10 @@ During Step 10, the agent expects the system to audit the twin against 10 strict
   - **Decision:** If Checks A–I are ALL `True`, write `CompletionFooter` with status `COMPLETE`.
   - If ANY check failed, withhold footer; twin cannot be admitted.
 
+> **AUDIT-010 — Verification conflicts:** Check F requires employer or section citation resolution, but media atoms have `citation: null`. Check I also needs to account for the media annotation fields and annotation state.
+>
+> **Status:** OPEN — preserve until the verification branches are reconciled and verified across all applicable checks.
+
 ---
 
 ### 6. Expected Outputs & Verification Metrics
@@ -424,6 +467,10 @@ At the conclusion of a successful run, verify the existence of these exact files
 #### Scenario 3: Missing Employment Anchor (No Work Declarations)
 - **System Action:** Evaluated per operator decision on Contradiction A. If structural fallback applies, section-attributed atomization proceeds under `SELF_REPORTED`. If dual gate applies, document is quarantined.
 
+> **AUDIT-011 — Conflicting quarantine rules:** Scenario 3 permits processing when Person data exists but employment declarations are missing. Step 9 describes P/E quarantine. These instructions conflict and require an operator decision.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Do not resolve this conflict autonomously.
+
 #### Scenario 4: Byte-Identical Duplicate File Submitted
 - **System Action:** Evaluated per operator decision on Contradiction C. If Step 11 duplicate rejection applies, second file is flagged `REJECTED_DUPLICATE` in `admission_registry.json`.
 
@@ -443,6 +490,11 @@ An operating run is declared **100% COMPLETE & VALID** when:
 # PART III — SOURCE & IMPLEMENTATION FIDELITY REFERENCE
 
 This guide reflects the exact, ratified implementation recorded in:
+
+> **AUDIT-012 — Unsupported implementation-complete claim:** The guide claims to reflect the ratified implementation despite the absence of implementation source. Distinguish architectural completeness from implementation readiness.
+>
+> **Status:** OPEN — preserve until the claim is corrected and independently verified.
+
 - [`01_original_reference_docs/`](01_original_reference_docs/) (Documents 1–5, build specs, and initial contracts).
 - [`02_addendums_and_clarifications/RULE-SDNA-INGESTION-CITATION-v1.md`](02_addendums_and_clarifications/RULE-SDNA-INGESTION-CITATION-v1.md) (Ingestion, work triads, and citation doubling pool).
 - [`02_addendums_and_clarifications/RULE-SDNA-ARCHITECTURE-ADDENDUM-v1.md`](02_addendums_and_clarifications/RULE-SDNA-ARCHITECTURE-ADDENDUM-v1.md) (Full-document sweep, section atomization, continuous UIDs, cohesive education bundles, and hardened Check H).

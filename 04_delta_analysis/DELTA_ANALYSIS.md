@@ -17,6 +17,10 @@
 | **UID Progression** | Atomic UIDs only assigned to employment blurbs (`{uid}-001` to `N`). | **Continuous Progression:** UIDs progress uninterrupted across employment, sections, and media blurbs. | UIDs never restart; continuous gapless sequence across the entire Document Twin. | **Clarified & Expanded.** |
 | **Check H Verification** | Verified that non-blurbs contained no atom UIDs and were excluded from atom counts. | **Hardened Check H:** Audits exact 1:1 parent citation matching, mutual exclusion on `SELF_REPORTED`, macro bundle cleanliness, and Media Manifest provenance channel. | Check H ensures section blurbs carry `SELF_REPORTED`, employment blurbs do not, and citations match exact parent section. Media blurbs pass via Channel 1 with `citation: null`. | **Superseded & Hardened.** Check H aligns with Addendum v1 and Media Rule v1. |
 | **Media Handling & Blurbs** | Media files cataloged with `PENDING_USER` placeholders; uninterpreted; stored in `Sheet 4`. | **Formalized by Media Rule v1:** User's `what_does_it_demonstrate` text **becomes an atomic blurb**. | Blurb receives sequential UID, links to `MED-{uid}` and checksum, with `citation: null`. Manifest is sole provenance. Human-only interpretation; all 5 fields audited. | **Clarified & Formalized.** Media Rule v1 defines the conversion lifecycle. |
+
+> **AUDIT-024 — Codified versus implemented:** The document describes `save_media_annotation` and media blurb conversion contracts as codified. There is no implementation source in the repository establishing that these functions exist. State whether each is specified, implemented, tested, or verified.
+>
+> **Status:** OPEN — preserve until each capability's status is evidenced and independently verified.
 | **Delimited Skill Lists** | No explicit rule on pipe/comma/bullet splitting within skills sections. | **Addendum v1 Rule:** Split on commas, pipes (`|`), and bullets into single-concept atomic blurbs. | Downstream agents can index, search, and retrieve specific skills individually. | **Clarified & Ratified.** |
 | **Education Credential Handling** | Education treated as generic non-blurb content. | **Addendum v1 Rule:** Keep Degree + School + Date together as cohesive credential bundles. | Context is preserved; commas do not sever the credential. | **Clarified & Ratified.** |
 | **Corpus Boundary & Identity** | Document-level focus; vague on multi-document candidate boundaries. | **Addendum v1 & Consensus:** Entire workbook/folder represents **exactly one person**. | Discrepancy in Person identity across files constitutes a fatal corpus collision requiring quarantine. | **Clarified & Ratified.** |
@@ -52,6 +56,10 @@
 - UIDs progress continuously without restarting across employment, section, and media blurbs.
 - Delimited skills are split into single-concept blurbs; education entries remain cohesive bundles.
 - Dual storage is maintained for section content: macro text in `NonBlurbBundle`, atomic claims in `atomic_blurbs`.
+
+> **AUDIT-025 — Missing operational implementation:** The documentation describes a media lifecycle, but the repository does not contain the persistence interface or conversion implementation. Track these as implementation gaps.
+>
+> **Status:** OPEN — preserve until both gaps are implemented and verified or explicitly retained as unimplemented requirements.
 
 ### Minor Interpretations Requiring Ongoing Observance:
 - **Exact Line-Wrapping in Markdown/Text Extractors:** When a PDF has line-wrapped sentences, hyphenation normalization is applied, while multi-line column layouts rely on deterministic text-stream extraction.

@@ -31,6 +31,10 @@
    - Before any blurb extraction begins, the engine scans the entire document to construct a comprehensive map of all top-level sections (e.g., Executive Summary, Professional Summary, Employment / Experience, Skills & Strengths, Education, Certifications, Patents, Publications).
    - Format-specific structural anchors are used (markdown headers `#`, `.docx` paragraph styles and bold runs, PDF font size/weight blocks, `.txt` line breaks and trailing colons).
 
+> **AUDIT-015 — Structural sweep must precede extraction:** Make the full-document section sweep explicit as a prerequisite to atomization. The workflow must discover sections before processing employment and remaining sections.
+>
+> **Status:** OPEN — preserve until ordering is corrected and verified across the complete workflow.
+
 2. **The PersonBundle as Corpus Authority & Collision Gatekeeper:**
    - An SDNA Evidence Workbook, directory, and package represents **exactly one person**.
    - Contact information (Name, Email, Phone, Location, Profile Links) is captured once into the canonical `PersonBundle` at the beginning.
@@ -82,6 +86,10 @@ Once employment processing is complete, the engine returns to the initial sectio
        1. The raw intact section text is stored in `DocumentTwin.non_blurb_info` (`NonBlurbBundle`) for macro-level scanning.
        2. The granular, atomized records are stored in `DocumentTwin.atomic_blurbs` (`AtomicBlurb`) for precision agent search and citation.
 
+> **AUDIT-016 — Dual-storage requirement:** Preserve intact macro section blocks and their granular atomic children. Neither representation replaces the other.
+>
+> **Status:** OPEN — preserve until both representations are corrected and verified end to end.
+
 ---
 
 ## 5. End-to-End Visual Example of Output Structure
@@ -112,7 +120,17 @@ Under this addendum, **Check H** in Step 10 is updated from the legacy "Non-Blur
    - **Case A (Employment Blurbs):** Must link to a declared employer (`employment_label`), match that employer's exact citation (`employment_map[label]`), and must **NOT** be classified as `SELF_REPORTED`.
    - **Case B (Section Blurbs):** Must link to a declared section (`section_label`), match that section's exact citation (`section_map[label]`), and **MUST** be classified as `SELF_REPORTED`.
    - **Case C (Media Blurbs per `RULE-SDNA-MEDIA-PROVENANCE-v1`):** Must carry `provenance_type == "MEDIA_MANIFEST"`, link to a valid `media_id` matching `media_manifest.json`, match the media file's binary `media_checksum`, and must have `citation == None`. **Check H and Check F must NEVER reject a valid media blurb for lacking an employer/section citation.**
+
+> **AUDIT-014 — Missing media validation branch:** Check H does not provide a media-specific validation path. Its current logic conflicts with the Media Provenance Rule.
+>
+> **Status:** OPEN — preserve until the media branch is corrected and verified against the Media Provenance Rule.
+
 2. **Zero Orphaned Blurbs:** Every atom must belong to exactly one of the three valid channels (Employer, Section, or Media Manifest).
+
+> **AUDIT-013 — Media atoms incorrectly classified as orphans:** The current logic treats atoms without employment or section labels as orphaned. Media atoms intentionally have neither. They use `provenance_type: "MEDIA_MANIFEST"`, `media_id`, `media_checksum`, and `citation: null`. The validation logic must recognize this established provenance type.
+>
+> **Status:** OPEN — preserve until orphan detection is corrected and independently verified.
+
 3. **Macro Container Cleanliness:** Macro bundles in `DocumentTwin.non_blurb_info` must carry `SELF_REPORTED` and must **never** receive an atomic UID or collide with atomic blurbs.
 
 ```python

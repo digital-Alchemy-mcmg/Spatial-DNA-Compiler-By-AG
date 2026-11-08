@@ -38,6 +38,10 @@ Downstream reasoning agents do not parse raw resumes or guess image contents. In
 * **Step 5 (Person Bundle Discovery - Anchor 1):** Extracts Name, Phone, Email, Location, and Links via regex and spaCy NER. Enforces identity discovery. *(Subject to Operator Contradiction A regarding whether missing employment alongside person identity triggers quarantine or structural fallback).*
 * **Step 6 (Employment Declaration Discovery - Anchor 2):** Discovers Date + Position + Company triads with **ordering invariance** (The Joanne's Fabrics Rule). Assigns alphabetical labels (`Employer A`, `Employer B`) and the first sequence of Unicode citations (`¿`, `¡`).
 
+> **AUDIT-026 — Conflicting admission rule:** The baseline's P/E gate conflicts with the later ingestion rule. Operator decision required.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Do not select an admission rule autonomously.
+
 ### Phase 3: Atomization & Provenance
 * **Step 7 (Employment Atomic Blurbs):** Isolates employer content regions. Atomizes bullet points and sentences while **strictly preserving action-outcome pairs**. Assigns sequential UIDs (`{source_uid}-001`, `-002`...) and prefixes blurbs with the parent employer's citation symbol.
 * **Step 8 (Section-Attributed Atomization & Dual Storage):** Returns to the initial full-document structural map. Processes remaining sections (Summary, Skills, Education, Certifications, etc.):
@@ -47,6 +51,10 @@ Downstream reasoning agents do not parse raw resumes or guess image contents. In
   - Preserves education entries as cohesive credential bundles.
   - Flags all section blurbs with `classification = "SELF_REPORTED"`.
   - Maintains dual storage: macro text preserved in `NonBlurbBundle`, granular claims in `atomic_blurbs`.
+
+> **AUDIT-027 — Section and media provenance consistency:** Confirm that the baseline represents employment atoms, section atoms, and media atoms as distinct provenance paths within the same continuous UID sequence.
+>
+> **Status:** OPEN — preserve until all three paths and the shared sequence are corrected and verified.
 
 ### Phase 4: Assembly & Quality Verification
 * **Step 9 (Document Twin Assembly & Quarantine):** Merges Person, Employment, Blurbs, Non-Blurbs, and Media refs into `{source_uid}-000.json`. Evaluates anchor gates. If quarantined, the **completion footer is strictly withheld.**
@@ -64,6 +72,10 @@ Downstream reasoning agents do not parse raw resumes or guess image contents. In
   - **Check I (Media Inventory Audit):** Audits all media references in `DocumentTwin.media_refs` against `media_manifest.json`. Verifies SHA-256 integrity, registration status (`REGISTERED`), and annotation status (`PENDING_USER` or `COMPLETE`). When `COMPLETE`, verifies all 5 user fields are populated and any corresponding promoted blurbs maintain byte-for-byte fidelity with `what_does_it_demonstrate`.
   - **Check J (Gatekeeper Certification):** Evaluates Checks A–I. Only if all pass 100%, Check J signs and attaches the tamper-evident `CompletionFooter`.
 * **Step 11 (Paired Admission Gate):** Verifies the 5 admission conditions. Produces `admission_registry.json`. *(Subject to Operator Contradiction C regarding duplicate file handling).*
+
+> **AUDIT-028 — Duplicate detection authority unresolved:** The original specification includes byte-identical file detection, while the later instruction places deduplication elsewhere. Do not assume Step 11 remains authorized to reject files without operator confirmation.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Do not assign duplicate-rejection authority autonomously.
 
 ### Phase 5: Output & Packaging
 * **Step 12 (5-Sheet Evidence Workbook):** Generates `evidence_workbook.xlsx` using OpenPyXL:

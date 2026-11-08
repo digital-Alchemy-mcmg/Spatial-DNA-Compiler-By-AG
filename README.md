@@ -12,6 +12,10 @@ This repository is the permanent, authoritative architectural reference for the 
 
 It preserves the complete history, technical specifications, subsequent addendums, delta analyses, and the unified architectural baseline developed across all engineering sessions. When returning to this codebase or building new modules, this repository serves as the definitive starting point without needing to reconstruct context from conversation logs.
 
+> **AUDIT-032 — Repository status and scope:** The README must accurately state whether the repository currently contains architectural documentation only or an executable implementation. It must not imply that the compiler can be built or operated from the repository while required modules are absent.
+>
+> **Status:** OPEN — preserve until the status statement is corrected and verified against the repository contents.
+
 ---
 
 ## Repository Structure & Directory Map

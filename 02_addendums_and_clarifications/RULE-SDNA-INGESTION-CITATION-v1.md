@@ -40,10 +40,19 @@
    - **Unclear / Missing Headers + Person Data Present = Valid & Parsable:**
      - If a document contains valid person data but lacks clear section headers or explicit employment declarations, **parse all of the blurbs regularly**.
      - Because there are no explicit headers or employment instances to anchor to, these blurbs are **uncited**.
+
+> **AUDIT-017 — Conflict with P/E quarantine:** This rule permits processing when Person data exists but employment declarations are absent. The original Document 4 and consolidated baseline describe missing Person or Employment anchors as quarantine conditions. Operator decision required.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Do not choose between these admission rules autonomously.
+
    - **Minor Conflict / Ambiguity Taxonomy:**
      - Uncited blurbs resulting from unclear sectioning/employment boundaries are flagged as **`MINOR_CONFLICT: AMBIGUOUS_PROVENANCE`**.
      - *Principle:* An ambiguity does not mean ambiguity of textual meaning; it means **ambiguity of where the blurb belongs** and whether that ambiguity impedes scanning, mapping, atomizing, or citing.
      - Never suppress or hesitate to mark provenance/structural ambiguities as minor conflicts. They preserve downstream auditability without halting processing.
+
+> **AUDIT-018 — Uncited atom representation unresolved:** The rule permits uncited blurbs with `MINOR_CONFLICT: AMBIGUOUS_PROVENANCE`, but other requirements demand parent citations and zero orphaned atoms. The validation model is unresolved.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Preserve both requirements until the validation model is decided and verified.
 
 3. **Employment Declarations (Work Instances):**
    - Must detect the triad: **`Date Range` + `Position / Job Title` + `Company / Employer`**.
@@ -67,6 +76,10 @@
    - **Prefix Placement:** Every single atomic blurb receives its provenance symbol at the **beginning**:
      - Format: `[UID]. [[CITATION]] [Blurb Content]` (e.g., `001. [¿] Managed diverse restaurant operations...`).
    - **Zero Orphaned Blurbs:** No blurb is left uncited or unanchored.
+
+> **AUDIT-019 — Citation fallback conflict:** Clarify how fallback attribution relates to the explicitly permitted uncited ambiguous-provenance case. Do not silently eliminate either instruction.
+>
+> **Status:** OPEN — OPERATOR DECISION REQUIRED. Preserve both instructions until their relationship is decided and verified.
 
 ---
 
